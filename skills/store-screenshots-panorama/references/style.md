@@ -23,6 +23,7 @@ All values are design pixels on a 1290-wide canvas; `assets/panorama.html` alrea
 8. Copy tone
 9. Dark theme
 10. iPhone Duo
+11. Google Play (Android phone)
 
 ## 1. Colour system
 The whole set uses only two backgrounds: the accent gradient and a second background (white in the light theme).
@@ -79,6 +80,10 @@ App Store Connect screenshot specifications (checked October 2026):
 - **iPhone Duo:** outer display 1398×2034, inner display 2007×2853 (2853×2007 in landscape). Required from April 2027
   for apps built with the iOS 27.1 SDK or later. App Store Connect does not scale other sizes into the Duo slots.
 - 1–10 images per slot, PNG or JPEG, with no alpha channel or transparency.
+- **Google Play phone:** JPEG or 24-bit PNG without alpha, each side 320–3840px, the long side at most twice the short
+  one, up to 8 per device type. To be eligible for Play's screenshot-based recommendation formats, an app needs at
+  least 4 portrait screenshots at 9:16, at least 1080×1920 (Play Console Help, "Add preview assets to showcase your
+  app", checked October 2026). So the Google Play set is 1080×1920 with 4–8 images.
 
 The template builds every device on a canvas 1290 design pixels wide and scales it to the output width. The design
 height follows from the output's aspect ratio:
@@ -88,6 +93,7 @@ height follows from the output's aspect ratio:
 | `iphone` | 1320×2868 and 1206×2622 | ≈2803 | outer 966×1999 @ (158,696), radius 180, screen 884 wide, Dynamic Island and buttons |
 | `duo-outer` | 1398×2034 | ≈1877 | outer 884×1249 @ (203,568), radius 150, screen 802×1167 |
 | `duo-inner` | 2007×2853 | ≈1834 | outer 884×1222 @ (203,552), radius 120, screen 802×1140 |
+| `android` | 1080×1920 | ≈2293 | outer 790×1655 @ (250,560), radius 110, screen 708×1573 (20:9), no Dynamic Island or buttons |
 
 - ~20px titanium rim, ~21px black bezel. The device is fully visible, with ~60–100px left below it.
 - Position and size are the same in every image, regardless of how many lines the headline has.
@@ -106,7 +112,8 @@ prayer times, a continue-reading card, a player, a result or a button.
     y≈1750–1850 rule, which only applies when the card is in the middle of the screen.
   - Converting between screen and design (iPhone): design x = 199 + raw x × 884/1206, design y = 737 + raw y × 884/1206
     (for a 1206-wide raw screenshot; for other widths use 884/width). On Duo: x = 244 + raw x × 802/raw width;
-    y = 609 (outer) or 593 (inner) + raw y × 802/raw width.
+    y = 609 (outer) or 593 (inner) + raw y × 802/raw width. On Android: x = 291 + raw x × 708/raw width;
+    y = 601 + raw y × 708/raw width.
   - The enlarged card is ~17% larger than its box on every side. Its edge must not cut a line of text in the dimmed
     screen in half: move it until the edge falls between lines or covers the line completely.
   - Take the corner radius from the card's own corner on screen (`data-r`).
@@ -264,3 +271,38 @@ panes).
 - Objects on the seams stay on the same seams; multiply their y positions by ~0.66.
 - Check: are the bottom of the device, the cards and the objects inside the canvas? Nothing may be cut off at the
   bottom.
+
+## 11. Google Play (Android phone)
+Google Play shows the app as Android users see it, so this set is made from Android screenshots only. An iPhone
+screenshot (Dynamic Island, iOS status bar and controls) in a Play listing, or an Android one in an iPhone frame, shows
+the app as something it isn't.
+
+**Raw screenshots.**
+- `raw-android/`, or per appearance `raw-android-light/` and `raw-android-dark/` (§9 works the same way). Same names
+  and order as `raw/` when both exist.
+- If the only screenshots given are Android ones (an Android status bar, a navigation bar or gesture handle, no Dynamic
+  Island), even in `raw/`, use that folder as the Android folder and make only the Google Play set. Say at delivery that
+  the App Store sets need iPhone screenshots.
+- The frame's screen is 20:9 (e.g. 1080×2400, the common ratio of current Android phones). A taller screenshot is cut
+  at the bottom and a shorter one leaves black under it. For another ratio, change the `android` entry in `DEVICES`
+  so that the screen, (w − 82) × (h − 82), has the screenshot's ratio, keep it centred, and keep ~80px below the
+  device.
+- The screen is 708 design px (593 output px), so any screenshot at least ~720px wide stays sharp.
+
+**Layout.** Like Duo, start from the iPhone panorama, or from the template if there is no iPhone set:
+- The story stays the same as the App Store set: order, headlines, palette, symbols and the colour sequence of the
+  headline zones.
+- The canvas is shorter (≈2293 instead of ≈2800), so the device is smaller (790 wide) and starts at y≈560. The
+  headline position and size don't change; standard headlines stay at 2 lines (they end at y≈450).
+- Redraw the background shapes for this height; multiply object y positions by ~0.82. The hero object shrinks to
+  ~1600.
+- The screen is narrower, so a full-width pop-out card needs `data-scale` ≈1.6 (instead of 1.35) to reach
+  ~1000–1100px. For a 1080-wide screenshot this is still about 1:1 in raw pixels at the 1080 output.
+
+**Play's own guidance** (recommended for phones, not required; it affects how Play may show and promote the listing):
+- Taglines take up at most 20% of the image. A 2-line headline is ≈15%; keep the hero to 3 short lines (≈20%).
+- Avoid device imagery that dates quickly or leaves out some users. The `android` frame is deliberately generic: no
+  camera, buttons or brand.
+
+**Not covered:** Wear OS (Play requires screenshots there without device frames, added text or backgrounds), tablets and
+Chromebooks (their own 16:9 / 9:16 sets), and the Play feature graphic (1024×500).

@@ -3,14 +3,16 @@
 Render a panorama page (a copy of assets/panorama.html) into store-size PNG slices with headless Chrome.
 
 Usage:
-    node render.mjs <panorama.html> --out <dir> [--theme light|dark] [--device iphone|duo-outer|duo-inner]
+    node render.mjs <panorama.html> --out <dir> [--theme light|dark] [--device iphone|duo-outer|duo-inner|android]
                     [--size WxH] [--preview <file.png>] [--only 2,5] [--no-slices]
 
-Devices and their default sizes (App Store Connect screenshot specifications, checked October 2026):
+Devices and their default sizes (App Store Connect and Google Play specifications, checked October 2026):
     iphone      1320x2868 (6.9"). Also render --size 1206x2622 (6.3"): App Store Connect requires the 6.3" class,
                 plus a 6.9" (or 6.5") set.
     duo-outer   1398x2034  iPhone Duo outer display
     duo-inner   2007x2853  iPhone Duo inner display
+    android     1080x1920  Google Play phone: 9:16 at 1080px is the minimum for Play's screenshot-based
+                           recommendation formats (at least 4 images)
 
 - Every <section class="shot"> is one image; the count is read from the page.
 - Slice i is the whole panorama seen through a W×H window moved i×W to the left, so shapes and
@@ -40,11 +42,12 @@ const BROWSERS = [
 ];
 const COMMANDS = ['google-chrome', 'google-chrome-stable', 'chromium', 'chromium-browser', 'microsoft-edge', 'brave-browser'];
 const PREVIEW_SCALE = 0.2;
-// Portrait sizes App Store Connect accepts for each layout in assets/panorama.html; ratio = height / width.
+// Portrait sizes the store accepts for each layout in assets/panorama.html; ratio = height / width.
 const DEVICES = {
   'iphone':    { size: '1320x2868', ratio: 2868 / 1320 },
   'duo-outer': { size: '1398x2034', ratio: 2034 / 1398 },
   'duo-inner': { size: '2007x2853', ratio: 2853 / 2007 },
+  'android':   { size: '1080x1920', ratio: 1920 / 1080 },
 };
 
 const sleep = ms => new Promise(resolve => setTimeout(resolve, ms));

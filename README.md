@@ -1,7 +1,7 @@
 # store-screenshots-panorama
 
-An Agent Skill that turns raw app screenshots into a finished App Store screenshot set that reads as one flowing
-panorama — in light and dark themes, for every required iPhone size and for iPhone Duo.
+An Agent Skill that turns raw app screenshots into a finished App Store or Google Play screenshot set that reads as one
+flowing panorama — in light and dark themes, for every required iPhone size, for iPhone Duo and for Android phones.
 
 ![A six-image App Store set for a prayer app, light theme on top and dark theme below](assets/demo.jpg)
 
@@ -23,10 +23,11 @@ resized and cropped; the background, headlines, device frames and 3D objects are
 - **Light and a real dark theme.** The dark theme is dark-dominant: accent colour only in headlines, objects and
   frames. Give it your app's dark-mode screenshots and the dark set shows the dark UI.
 - **Every required size.** iPhone 6.9" (1320×2868) and 6.3" (1206×2622), plus iPhone Duo outer (1398×2034) and inner
-  (2007×2853) when Duo screenshots are provided. Output is PNG without alpha.
+  (2007×2853) when Duo screenshots are provided, and a Google Play phone set (1080×1920) when Android screenshots are
+  provided. Output is PNG without alpha.
 
-What it won't do: redraw, regenerate or translate the UI, put iPhone screenshots in a Duo frame, or add shopping-ad
-clutter like campaign badges and discount ribbons.
+What it won't do: redraw, regenerate or translate the UI, put iPhone screenshots in a Duo frame or Android screenshots
+in an iPhone frame, or add shopping-ad clutter like campaign badges and discount ribbons.
 
 ## Install
 
@@ -59,6 +60,16 @@ For iPhone Duo, add screenshots from the iPhone Duo simulator (Xcode 27.1) in `r
 with the same names as in `raw/`. App Store Connect requires Duo screenshots from April 2027 for apps built with the
 iOS 27.1 SDK or later.
 
+For Google Play, put Android screenshots in `raw-android/` (or `raw-android-light/` and `raw-android-dark/`). If you
+only have Android screenshots, you can ask for the Play Store set directly:
+
+```text
+Use the store-screenshots-panorama skill.
+Make Google Play screenshots from the Android screens in raw/, light and dark.
+```
+
+The set is 1080×1920 (9:16), the size Play asks for to show screenshots in its recommendation formats.
+
 You can also run the renderer yourself:
 
 ```bash
@@ -66,8 +77,8 @@ node skills/store-screenshots-panorama/scripts/render.mjs out/.src/panorama.html
   --theme dark --device iphone --out out/en/dark/iphone-6.9 --preview out/.src/preview-dark.png
 ```
 
-`--device` is `iphone`, `duo-outer` or `duo-inner`; pass `--size 1206x2622` for the 6.3" set, `--only 2,5` to
-re-render single images.
+`--device` is `iphone`, `duo-outer`, `duo-inner` or `android`; pass `--size 1206x2622` for the 6.3" set, `--only 2,5`
+to re-render single images.
 
 ## Repository structure
 
@@ -81,7 +92,7 @@ store-screenshots-panorama-skill/
     └── store-screenshots-panorama/
         ├── SKILL.md
         ├── references/
-        │   └── style.md          measured layout, colour roles, 3D objects, dark theme, iPhone Duo
+        │   └── style.md          measured layout, colour roles, 3D objects, dark theme, iPhone Duo, Google Play
         ├── assets/
         │   └── panorama.html     the template: devices, crops, dimming, 3D objects, hero
         └── scripts/

@@ -72,7 +72,8 @@ body { margin: 0; background: var(--bg2); }
 /* Device: position and size come from the DEVICES table in the script (render.mjs --device). Rim 20 + bezel 21 px.
    iphone:    outer 966×1999 @ (158,696), radius 180 → screen 884 wide, radius 140
    duo-outer: outer 884×1249 @ (203,568), radius 150 (design height ≈1877)
-   duo-inner: outer 884×1222 @ (203,552), radius 120 (design height ≈1834) */
+   duo-inner: outer 884×1222 @ (203,552), radius 120 (design height ≈1834)
+   android:   outer 790×1655 @ (250,560), radius 110 → screen 708×1573 (20:9) (design height ≈2293) */
 .phone { position: absolute; left: var(--dev-x, 158px); top: var(--dev-y, 696px); width: var(--dev-w, 966px); height: var(--dev-h, 1999px);
          box-sizing: border-box; padding: 20px;
          border-radius: var(--dev-r, 180px); z-index: 2; filter: var(--phone-shadow);
@@ -89,9 +90,12 @@ body { margin: 0; background: var(--bg2); }
 .screen::after { content: ""; position: absolute; top: 24px; left: 50%; width: 276px; height: 82px; margin-left: -138px;
                  border-radius: 41px; background: #000; z-index: 3; }
 .phone.dim .screen::before { content: ""; position: absolute; inset: 0; background: #000; opacity: var(--dim); z-index: 2; }
-/* iPhone Duo: the camera, hinge and button positions are not verified, so they are not drawn (plain frame) */
+/* iPhone Duo: the camera, hinge and button positions are not verified, so they are not drawn (plain frame).
+   Android: a generic phone; the screenshot carries its own status bar, so no Dynamic Island and no buttons. */
 html[data-device^="duo"] .phone::before, html[data-device^="duo"] .phone::after,
-html[data-device^="duo"] .screen::after { display: none; }
+html[data-device^="duo"] .screen::after,
+html[data-device="android"] .phone::before, html[data-device="android"] .phone::after,
+html[data-device="android"] .screen::after { display: none; }
 
 /* A part cropped from the raw screenshot. The script computes its position, size and rotation:
    data-crop="x,y,w,h" (raw px), data-center="cx,cy" (design px), data-scale (× its size inside the phone),
@@ -220,6 +224,7 @@ html[data-device^="duo"] .screen::after { display: none; }
     'iphone':    { x: 158, y: 696, w: 966, h: 1999, r: 180 },
     'duo-outer': { x: 203, y: 568, w: 884, h: 1249, r: 150 },   // screen 802×1167 (1398×2034 ratio)
     'duo-inner': { x: 203, y: 552, w: 884, h: 1222, r: 120 },   // screen 802×1140 (2007×2853 ratio)
+    'android':   { x: 250, y: 560, w: 790, h: 1655, r: 110 },   // screen 708×1573 (20:9, e.g. 1080×2400)
   };
   root.dataset.device = q.get('device') || root.dataset.device || 'iphone';
   const dev = DEVICES[root.dataset.device];
@@ -245,7 +250,8 @@ html[data-device^="duo"] .screen::after { display: none; }
   pano.style.setProperty('--hd', (H / k) + 'px');
   pano.style.transform = `scale(${k})`;
   const bg = pano.querySelector('svg.bg');
-  // Background shapes are drawn at the design height: iPhone ≈2800, duo-outer ≈1877, duo-inner ≈1834
+  // Background shapes are drawn at the design height: iPhone ≈2800, duo-outer ≈1877, duo-inner ≈1834,
+  // android ≈2293
   if (bg && !bg.getAttribute('viewBox')) bg.setAttribute('viewBox', `0 0 ${shots.length * 1290} ${Math.round(H / k)}`);
 
   // ---------- 3D objects: puffy, glossy SVG (extrusion layers + lighting filter) ----------
