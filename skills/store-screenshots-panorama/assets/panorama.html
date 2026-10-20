@@ -174,7 +174,7 @@ html[data-device^="duo"] .screen::after { display: none; }
 
   <!-- Standard: pop-out card + feature chip -->
   <section class="shot" data-raw="../../raw/03.png">
-    <h1 class="hl on-2">Second example<br>headline</h1>
+    <h1 class="hl on-2">Second benefit<br>headline</h1>
     <div class="phone dim"><div class="bezel"><div class="screen"><img src="../../raw/03.png"></div></div></div>
     <div class="crop" data-crop="36,577,1134,248" data-center="645,1800" data-scale="1.35" data-r="57"></div>
     <div class="chip" style="left:40px; top:560px"><div class="crop inline" data-crop="75,635,132,132" data-scale="1.35" data-r="66"></div>Short label</div>
@@ -403,11 +403,27 @@ html[data-device^="duo"] .screen::after { display: none; }
     }
   }
 
+  // ---------- Headline fit (every line must fit the headline width; a wider line wraps into an extra line) ----------
+  function headlineFit() {
+    try {
+      for (const h of document.querySelectorAll('.hl')) {
+        const intended = h.querySelectorAll('br').length + 1;
+        const lineHeight = parseFloat(getComputedStyle(h).lineHeight);
+        if (!lineHeight) continue;
+        const rendered = Math.round(h.offsetHeight / lineHeight);
+        const text = h.innerHTML.replace(/<br\s*\/?>/gi, ' / ').replace(/<[^>]+>/g, '').trim();
+        if (rendered > intended) console.warn(`WARN: headline [${text}] has ${intended} lines but wraps into ${rendered}; a line is wider than ${h.clientWidth}px. Cut words, do not shrink the font.`);
+        else if (h.scrollWidth > h.clientWidth) console.warn(`WARN: headline [${text}] has a word wider than ${h.clientWidth}px. Cut words, do not shrink the font.`);
+      }
+    } catch (e) { console.error('Error: ' + e.message); }
+  }
+
   window.addEventListener('load', () => {
     try {
       contrast();
       rawSizes();
       place();
+      document.fonts.ready.then(headlineFit);
       for (const i of document.images) if (!i.naturalWidth) console.warn('WARN: image failed to load: ' + i.src);
       document.body.dataset.ready = '1';
     } catch (e) { console.error('Error: ' + e.message); }
