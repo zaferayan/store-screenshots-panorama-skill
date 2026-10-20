@@ -63,12 +63,17 @@ function parseArgs(argv) {
   const opts = { page: null, out: null, theme: 'light', device: 'iphone', size: null, preview: null, only: null, slices: true };
   for (let i = 0; i < argv.length; i++) {
     const a = argv[i];
-    if (a === '--out') opts.out = argv[++i];
-    else if (a === '--theme') opts.theme = argv[++i];
-    else if (a === '--device') opts.device = argv[++i];
-    else if (a === '--size') opts.size = argv[++i];
-    else if (a === '--preview') opts.preview = argv[++i];
-    else if (a === '--only') opts.only = argv[++i].split(',').map(Number);
+    const value = () => {
+      const next = argv[i + 1];
+      if (next === undefined || next.startsWith('--')) fail(`${a} needs a value`);
+      return argv[++i];
+    };
+    if (a === '--out') opts.out = value();
+    else if (a === '--theme') opts.theme = value();
+    else if (a === '--device') opts.device = value();
+    else if (a === '--size') opts.size = value();
+    else if (a === '--preview') opts.preview = value();
+    else if (a === '--only') opts.only = value().split(',').map(Number);
     else if (a === '--no-slices') opts.slices = false;
     else if (a === '-h' || a === '--help') opts.help = true;
     else opts.page = a;
@@ -136,6 +141,7 @@ async function main() {
   if (!['light', 'dark'].includes(opts.theme)) fail('--theme must be light or dark');
   if (!DEVICES[opts.device]) fail(`--device must be one of ${Object.keys(DEVICES).join(', ')}`);
   opts.size ??= DEVICES[opts.device].size;
+  if (!/^[1-9]\d*x[1-9]\d*$/i.test(opts.size)) fail(`--size must look like 1320x2868, got "${opts.size}"`);
   const pagePath = path.resolve(opts.page);
   if (!fs.existsSync(pagePath)) fail(`page not found: ${pagePath}`);
   const html = fs.readFileSync(pagePath, 'utf8').replace(/<!--[\s\S]*?-->/g, '');
@@ -158,7 +164,7 @@ async function main() {
   try {
     const wanted = !opts.slices ? [] : opts.only ? opts.only.map(n => n - 1) : [...Array(count).keys()];
     for (const i of wanted) {
-      if (!(i >= 0 && i < count)) fail(`--only: there are ${count} images`);
+      if (!(Number.isInteger(i) && i >= 0 && i < count)) fail(`--only: use image numbers from 1 to ${count}`);
       const wrapper = path.join(workDir, `slice-${i}.html`);
       fs.writeFileSync(wrapper, frame(src, W, H, -i * W, iframeSize));
       const out = path.join(outDir, `${String(i + 1).padStart(2, '0')}.png`);
